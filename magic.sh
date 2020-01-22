@@ -7,17 +7,21 @@
 # Copyright © 2017
 # -----------------------------------------------------
 # Modified by - Rokib Hasan Sagar @rokibhasansagar
-# -----------------------------------------------------
+# =====================================================
 
 ### Definitions need to be in ENV ---
 
-# ROMNAME= "Short Name of ROM"
+# ROMName= "Short Name of ROM"
 # Manifest_Link= "Git URL of Manifest Repo"
-# BRANCH= "Exact Name of the Branch"
+# Branch= "Exact Name of the Branch"
 
 # GitHubMail, GitHubName
 # FTPHost, FTPUser, FTPPass
-# SFUser, SFPass, SFProject=transkadoosh
+# SFUser, SFPass, SFProject
+
+# Set Where to Upload
+Upload2AFH = 'true'
+Upload2SF = 'true'
 
 ### ---------------------------------------------------
 
@@ -48,7 +52,7 @@ cd tranSKadooSH
 datetime=$(date +%Y%m%d)
 
 echo -e "$CL_RED Initialize repo $CL_RST"
-repo init -q -u $Manifest_Link -b $BRANCH --depth 1
+repo init -q -u $Manifest_Link -b $Branch --depth 1
 
 echo -e "$CL_YLW Syncing it up! Wait for a few minutes... $CL_RST"
 repo sync -c -q --force-sync --no-clone-bundle --no-tags -j32
@@ -67,27 +71,31 @@ mkdir fileparts
 
 cd transload/
 echo -e "$CL_RED Source Compressing in parts, This will take some time $CL_RST"
-tar -cJf --verbose - * | split -b 700M - ../fileparts/$ROMNAME-$BRANCH-repo-$datetime.tar.xz.
+tar -cJf --verbose - * | split -b 700M - ../fileparts/$ROMName-$Branch-repo-$datetime.tar.xz.
 
 cd ../fileparts/
 echo -e "$CL_PFX Taking md5sums $CL_RST"
-md5sum * > $ROMNAME-$BRANCH-repo-$datetime.md5sum
+md5sum * > $ROMName-$Branch-repo-$datetime.md5sum
+echo -e "$CL_GRN The Compressed Files are - $CL_RST"
+du -sh *
 
+if [[ $Upload2AFH = 'true' ]]
 # Upload to AFH FTP
-cd $DIR
 echo -e "$CL_XOS Begin to upload $CL_RST"
 
-wput fileparts ftp://"$FTPUser":"$FTPPass"@"$FTPHost"/tranSkadooSH/
+for afhfile in $ROMName*; do wput $afhfile ftp://"$FTPUser":"$FTPPass"@"$FTPHost"/tranSkadooSH/$ROMName/$Branch/; done
 echo -e "$CL_GRN Done uploading $CL_RST"
+fi
 
+if [[ $Upload2SF = 'true' ]]
 # Upload to SF
-cd $DIR
 echo -e "$CL_XOS Begin to upload in SF $CL_RST"
 
 echo "exit" | sshpass -p "$SFPass" ssh -tto StrictHostKeyChecking=no $SFUser@shell.sourceforge.net create
-rsync -v --rsh="sshpass -p $SFPass ssh -l $SFUser" fileparts/ $SFUser@shell.sourceforge.net:/home/frs/project/$SFProject/$ROMNAME/$BRANCH/
+for sffile in $ROMName*; do rsync -v --rsh="sshpass -p $SFPass ssh -l $SFUser" $sffile $SFUser@shell.sourceforge.net:/home/frs/project/$SFProject/$ROMName/$Branch/; done
 
 echo -e "$CL_GRN Done uploading $CL_RST"
+fi
 
 # Clean Up
 cd $DIR
