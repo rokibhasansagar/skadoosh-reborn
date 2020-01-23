@@ -19,10 +19,6 @@
 # FTPHost, FTPUser, FTPPass
 # SFUser, SFPass, SFProject
 
-# Set Where to Upload
-Upload2AFH = 'true'
-Upload2SF = 'true'
-
 ### ---------------------------------------------------
 
 # Colors
@@ -71,7 +67,7 @@ mkdir fileparts
 
 cd transload/
 echo -e "$CL_RED Source Compressing in parts, This will take some time $CL_RST"
-tar -cJf --verbose - * | split -b 700M - ../fileparts/$ROMName-$Branch-repo-$datetime.tar.xz.
+tar -cJf --verbose - * | split -b 1280M - ../fileparts/$ROMName-$Branch-repo-$datetime.tar.xz.
 
 cd ../fileparts/
 echo -e "$CL_PFX Taking md5sums $CL_RST"
