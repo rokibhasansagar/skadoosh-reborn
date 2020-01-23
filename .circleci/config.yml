@@ -1,0 +1,38 @@
+version: 2
+jobs:
+  build:
+    docker:
+      # Alpine Linux Custom Container
+      - image: fr3akyphantom/skadoosh:latest
+    environment:
+      ROMName: 'ResurrectionRemix'
+      Manifest_Link: 'https://github.com/ResurrectionRemix/platform_manifest'
+      Branch: 'nougat'
+      Upload2AFH: 'true'
+      Upload2SF: 'true'
+    working_directory: /home/alpine/projects/
+    steps:
+      - checkout
+      - run:
+          name: Create Persistent act-shell
+          command: |
+            cat << EOF > /tmp/act.sh
+            #!/bin/bash
+            while true; do
+              echo -en "'\033[36m' Current Date-Time is --- '\033[0m'"
+              date
+              sleep 240
+            done
+            EOF
+      - run:
+          name: Access Permission
+          command: chmod +x ./magic.sh /tmp/act.sh
+      - run:
+          name: Fire-Up the Program
+          command: echo "Running..."; /tmp/act.sh & ./magic.sh
+workflows:
+  version: 2
+  build_and_test:
+    jobs:
+      - build:
+          context: personal-envs
