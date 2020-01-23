@@ -88,6 +88,7 @@ repo_sync_shallow() {
 move_repo() {
   cd $DIR
   mv tranSKadooSH/.repo transload/
+  tree -a --du -sh -- $DIR/transload/
 }
 
 clean_checkout() {
@@ -99,7 +100,7 @@ clean_checkout() {
 compress_shallow() {
   cd $DIR/transload/
   echo -e "\n$CL_RED Source Compressing in parts, This will take some time $CL_RST"
-  tar -cJf - .git | split -b 1280M - ../fileparts/$ROMName-$Branch-repo-$datetime.tar.xz.
+  tar -cJf - .repo | split -b 1280M - ../fileparts/$ROMName-$Branch-repo-$datetime.tar.xz.
 
   cd $DIR/fileparts/
   echo -e "\n$CL_PFX Taking md5sums $CL_RST"
