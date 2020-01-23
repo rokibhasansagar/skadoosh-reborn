@@ -82,13 +82,13 @@ repo_sync_shallow() {
   echo -e "\n$CL_RED SHALLOW Source Syncing done $CL_RST"
 
   echo -e "\n$CL_BLU All Checked-out Folder/File Sizes $CL_RST"
-  du -sh *
+  tree -a --du -sh -- $DIR/tranSKadooSH
 }
 
 move_repo() {
   cd $DIR
   mv tranSKadooSH/.repo transload/
-  tree -a --du -sh -- $DIR/transload/
+  tree -a $DIR/transload/
 }
 
 clean_checkout() {
