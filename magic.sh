@@ -47,13 +47,33 @@ cd tranSKadooSH
 
 datetime=$(date +%Y%m%d)
 
+echo -en "$CL_GRN Setup Google Cookies for Smooth googlesource Clonning $CL_RST"
+git clone -q "https://$GITHUB_TOKEN@github.com/rokibhasansagar/google-git-cookies.git" &> /dev/null
+if [ -e google-git-cookies ]; then
+  bash google-git-cookies/setup_cookies.sh
+  rm -rf google-git-cookies
+else
+  echo "google-git-cookies repo not found on your account, see steps on README"
+fi
+
 echo -e "$CL_RED Initialize repo $CL_RST"
 repo init -q -u $Manifest_Link -b $Branch --depth 1
 
+# Trim Darwin
+cd .repo/manifests
+sed -i '/darwin/d' default.xml
+git commit -a -m "Magic" || true
+cd ../
+sed -i '/darwin/d' manifest.xml
+cd ../
+
 echo -e "$CL_YLW Syncing it up! Wait for a few minutes... $CL_RST"
-repo sync -c -q --force-sync --no-clone-bundle --no-tags -j32
+repo sync -c -q --force-sync --no-clone-bundle --optimized-fetch --prune --no-tags -j32
 
 echo -e "$CL_RED SHALLOW Source Syncing done $CL_RST"
+
+# All Checked-out Folder/File Sizes
+du -sh *
 
 cd $DIR
 
@@ -67,7 +87,7 @@ mkdir fileparts
 
 cd transload/
 echo -e "$CL_RED Source Compressing in parts, This will take some time $CL_RST"
-tar -cJf --verbose - * | split -b 1280M - ../fileparts/$ROMName-$Branch-repo-$datetime.tar.xz.
+tar -cJf - * | split -b 1280M - ../fileparts/$ROMName-$Branch-repo-$datetime.tar.xz.
 
 cd ../fileparts/
 echo -e "$CL_PFX Taking md5sums $CL_RST"
