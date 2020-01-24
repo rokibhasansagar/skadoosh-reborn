@@ -37,7 +37,8 @@ CL_RST="\033[0m"
 DIR=$(pwd)
 echo -en "$CL_BLU Current directory is - $CL_RST" && echo $DIR
 
-mkdir -p {tranSKadooSH,transload,fileparts}
+mkdir -p {tranSKadooSH,transload}
+mkdor -p $ROMName/$Branch
 cd tranSKadooSH
 
 datetime=$(date +%Y%m%d)
@@ -100,9 +101,9 @@ clean_checkout() {
 compress_shallow() {
   cd $DIR/transload/
   echo -e "\n$CL_RED Source Compressing in parts, This will take some time $CL_RST"
-  tar -cJf - .repo | split -b 1280M - ../fileparts/$ROMName-$Branch-repo-$datetime.tar.xz.
+  tar -cJf - .repo | split -b 1280M - ../$ROMName/$Branch/$ROMName-$Branch-repo-$datetime.tar.xz.
 
-  cd $DIR/fileparts/
+  cd $DIR/$ROMName/$Branch/
   echo -e "\n$CL_PFX Taking md5sums $CL_RST"
   md5sum * > $ROMName-$Branch-repo-$datetime.md5sum
   echo -e "\n$CL_GRN The Compressed Files are - $CL_RST"
@@ -110,7 +111,7 @@ compress_shallow() {
 }
 
 upload_afh_ftp() {
-  cd $DIR/fileparts/
+  cd $DIR/$ROMName/$Branch/
   echo -e "\n$CL_XOS Begin to upload into AndroidFileHost FTP $CL_RST"
 
   for afhfile in $ROMName*; do wput $afhfile ftp://"$FTPUser":"$FTPPass"@"$FTPHost"/tranSkadooSH/$ROMName/$Branch/; done
@@ -118,11 +119,11 @@ upload_afh_ftp() {
 }
 
 upload_sf_rel() {
-  cd $DIR/fileparts/
+  cd $DIR/
   echo -e "\n$CL_XOS Begin to upload into SourceForge Release $CL_RST"
 
   echo "exit" | sshpass -p "$SFPass" ssh -tto StrictHostKeyChecking=no $SFUser@shell.sourceforge.net create
-  for sffile in $ROMName*; do rsync -v --rsh="sshpass -p $SFPass ssh -l $SFUser" $sffile $SFUser@shell.sourceforge.net:/home/frs/project/$SFProject/$ROMName/$Branch/; done
+  rsync -arvz --rsh="sshpass -p $SFPass ssh -l $SFUser" $ROMName/ $SFUser@shell.sourceforge.net:/home/frs/project/$SFProject/$ROMName/  
 
   echo -e "\n$CL_GRN Done uploading $CL_RST"
 }
@@ -138,7 +139,7 @@ release_payload() {
 
 clean_all() {
   cd $DIR
-  rm -rf fileparts transload
+  rm -rf transload $ROMName
 }
 
 tranSKadooSH() {
