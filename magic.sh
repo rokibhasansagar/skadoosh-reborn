@@ -39,6 +39,8 @@ echo -en "$CL_BLU Current directory is - $CL_RST" && echo $DIR
 
 mkdir -p {tranSKadooSH,transload}
 mkdor -p $ROMName/$Branch
+tree -a
+
 cd tranSKadooSH
 
 datetime=$(date +%Y%m%d)
@@ -83,13 +85,11 @@ repo_sync_shallow() {
   echo -e "\n$CL_RED SHALLOW Source Syncing done $CL_RST"
 
   echo -e "\n$CL_BLU All Checked-out Folder/File Sizes $CL_RST"
-  tree -a --du -sh -- $DIR/tranSKadooSH
 }
 
 move_repo() {
   cd $DIR
   mv tranSKadooSH/.repo transload/
-  tree -a $DIR/transload/
 }
 
 clean_checkout() {
@@ -123,7 +123,7 @@ upload_sf_rel() {
   echo -e "\n$CL_XOS Begin to upload into SourceForge Release $CL_RST"
 
   echo "exit" | sshpass -p "$SFPass" ssh -tto StrictHostKeyChecking=no $SFUser@shell.sourceforge.net create
-  rsync -arvz --rsh="sshpass -p $SFPass ssh -l $SFUser" $ROMName/ $SFUser@shell.sourceforge.net:/home/frs/project/$SFProject/$ROMName/  
+  rsync -arvPz --rsh="sshpass -p $SFPass ssh -l $SFUser" $ROMName/ $SFUser@shell.sourceforge.net:/home/frs/project/$SFProject/$ROMName/  
 
   echo -e "\n$CL_GRN Done uploading $CL_RST"
 }
