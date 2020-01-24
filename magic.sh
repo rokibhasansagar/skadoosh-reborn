@@ -38,7 +38,7 @@ DIR=$(pwd)
 echo -en "$CL_BLU Current directory is - $CL_RST" && echo $DIR
 
 mkdir -p {tranSKadooSH,transload}
-mkdor -p $ROMName/$Branch
+mkdir -p $ROMName/$Branch
 tree -a
 
 cd tranSKadooSH
@@ -101,7 +101,7 @@ clean_checkout() {
 compress_shallow() {
   cd $DIR/transload/
   echo -e "\n$CL_RED Source Compressing in parts, This will take some time $CL_RST"
-  tar -cJf - .repo | split -b 1280M - ../$ROMName/$Branch/$ROMName-$Branch-repo-$datetime.tar.xz.
+  tar -cJf - .repo | split -b 700M - ../$ROMName/$Branch/$ROMName-$Branch-repo-$datetime.tar.xz.
 
   cd $DIR/$ROMName/$Branch/
   echo -e "\n$CL_PFX Taking md5sums $CL_RST"
